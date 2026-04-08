@@ -1,3 +1,5 @@
 <Solution>
   <Project Path="ProjectSatellite.API/ProjectSatellite.API.csproj" />
+  <Project Path="ProjectSatellite.APIClients/ProjectSatellite.APIClients.csproj" />
+  <Project Path="ProjectSatellite.Models/ProjectSatellite.Models.csproj" />
 </Solution>

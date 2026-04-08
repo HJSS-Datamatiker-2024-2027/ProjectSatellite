@@ -15,7 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\ProjectSatellite.APIClients\ProjectSatellite.APIClients.csproj" />
+    <ProjectReference Include="..\ProjectSatellite.Models\ProjectSatellite.Models.csproj" />
   </ItemGroup>
 
 </Project>
