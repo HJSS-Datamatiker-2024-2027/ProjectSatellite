@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjectSatellite.APIClients\ProjectSatellite.APIClients.csproj" />
+    <ProjectReference Include="..\ProjectSatellite.DAL\ProjectSatellite.DAL.csproj" />
     <ProjectReference Include="..\ProjectSatellite.Models\ProjectSatellite.Models.csproj" />
   </ItemGroup>
 
