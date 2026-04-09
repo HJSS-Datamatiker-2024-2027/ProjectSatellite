@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="ProjectSatellite.API/ProjectSatellite.API.csproj" />
   <Project Path="ProjectSatellite.APIClients/ProjectSatellite.APIClients.csproj" />
+  <Project Path="ProjectSatellite.DAL/ProjectSatellite.DAL.csproj" Id="9ba94b0b-e342-430b-a7f9-26d9339e7b16" />
   <Project Path="ProjectSatellite.Models/ProjectSatellite.Models.csproj" />
 </Solution>

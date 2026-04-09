@@ -1,5 +1,7 @@
 
 using ProjectSatellite.APIClients;
+using ProjectSatellite.DAL;
+using StackExchange.Redis;
 
 namespace ProjectSatellite.API
 {
@@ -17,6 +19,13 @@ namespace ProjectSatellite.API
 
             builder.Services.AddScoped<IApiClient>(sp =>
             new BCApiClient("http://bcserver:7048/BC/api/gruppe6/apiGroup/v1.0/companies(c9e99b22-5515-f111-ac69-6045bdc8bf9f)/licenses")); //TODO: smid i .env
+
+            builder.Services.AddSingleton(ConnectionMultiplexer.Connect("localhost:6379"));
+
+            builder.Services.AddScoped<IDatabase>(sp =>
+                sp.GetRequiredService<ConnectionMultiplexer>().GetDatabase());
+
+            builder.Services.AddScoped<IExtensionLicenseDAO, RedisExtensionLicenseDAO>();
 
             var app = builder.Build();
 
