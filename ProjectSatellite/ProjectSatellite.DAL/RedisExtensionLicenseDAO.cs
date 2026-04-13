@@ -24,10 +24,16 @@ namespace ProjectSatellite.DAL
 
                 if (data.IsNullOrEmpty)
                 {
-                    throw new Exception($"Could not find license related to tenantId {tenantId}");
+                    throw new Exception($"License with tenantId {tenantId} was not found!"); //TODO: Cache miss er normale, så vi der burde nok ikke smides en exception her!
                 }
 
-                return JsonSerializer.Deserialize<ExtensionLicense>((string)data);
+                var result = JsonSerializer.Deserialize<ExtensionLicense>((string)data!);
+                if (result == null)
+                {
+                    throw new Exception("Failed to deserialize ExtensionLicense");
+                }
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -41,7 +47,7 @@ namespace ProjectSatellite.DAL
             {
                 var json = JsonSerializer.Serialize(extensionLicense);
 
-                bool success = await _redisCache.StringSetAsync($"license:{extensionLicense.TenantId}", json);
+                bool success = await _redisCache.StringSetAsync($"license:{extensionLicense.TenantId}", json, TimeSpan.FromMinutes(5));
 
                 //TODO: slet dette:
                 //await _redisCache.SetAddAsync("licenses:all", extensionLicense.TenantId);
