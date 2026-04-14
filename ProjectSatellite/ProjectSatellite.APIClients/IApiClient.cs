@@ -7,6 +7,7 @@ namespace ProjectSatellite.APIClients
 {
     public interface IApiClient
     {
-        public Task<ExtensionLicenseResponse> GetAsync();
+        public Task<ExtensionLicenseResponse> GetAsync(Guid tenantId, int extensionId);
+        public Task<ExtensionLicenseResponse> GetAllAsync(Guid tenantId);
     }
 }

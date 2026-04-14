@@ -20,23 +20,43 @@ namespace ProjectSatellite.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetAsync()
+        public async Task<ActionResult> GetAllAsync(Guid tenantId)
         {
             try
             {
-                ExtensionLicenseResponse response = await _bcApiClient.GetAsync();
-
+                ExtensionLicenseResponse response = await _bcApiClient.GetAllAsync(tenantId);
+                
                 foreach (var license in response.Value)
                 {
                     await _extensionLicenseDAO.InsertAsync(license);
                 }
 
-                return Ok(await _extensionLicenseDAO.GetAsync(response.Value[0].TenantId.ToString()));
+                return Ok(await _extensionLicenseDAO.GetAllAsync(tenantId));
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
             }
         }
+
+        //[HttpGet]
+        //public async Task<ActionResult> GetAsync(Guid tenantId, int extensionId)
+        //{
+        //    try
+        //    {
+        //        ExtensionLicenseResponse response = await _bcApiClient.GetAsync(tenantId, extensionId);
+
+        //        foreach (var license in response.Value)
+        //        {
+        //            await _extensionLicenseDAO.InsertAsync(license);
+        //        }
+
+        //        return Ok(await _extensionLicenseDAO.GetAsync(response.Value[0].TenantId, response.Value[0].ExtensionId));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex);
+        //    }
+        //}
     }
 }

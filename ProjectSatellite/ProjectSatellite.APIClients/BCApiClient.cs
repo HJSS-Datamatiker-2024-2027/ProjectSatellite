@@ -20,7 +20,7 @@ namespace ProjectSatellite.APIClients
             _restClient = new RestClient(_baseUri);
         }
 
-        public async Task<ExtensionLicenseResponse> GetAsync()
+        public async Task<ExtensionLicenseResponse> GetAsync(Guid tenantId, int extensionId)
         {
             var request = new RestRequest();
             request.Method = Method.Get;
@@ -31,14 +31,39 @@ namespace ProjectSatellite.APIClients
 
             request.AddHeader("Authorization", authHeader);
 
+            request.AddQueryParameter("$filter", $"tenantId eq {tenantId} and extensionId eq {extensionId}");
+
             var response = await _restClient.ExecuteAsync<ExtensionLicenseResponse>(request);
 
             if (!response.IsSuccessful || response.Data == null)
             {
-                throw new Exception(); //TODO: Tilføj ordentlig error
+                throw new Exception($"Error getting ExtensionLicense with tenantId {tenantId} and extensionId {extensionId}.");
             }
 
             return response.Data; //TODO: Temp løsning
+        }
+
+        public async Task<ExtensionLicenseResponse> GetAllAsync(Guid tenantId)
+        {
+            var request = new RestRequest();
+            request.Method = Method.Get;
+
+            string authHeader = "Basic " + Convert.ToBase64String(
+                Encoding.ASCII.GetBytes($"{_username}:{_password}")
+            );
+
+            request.AddHeader("Authorization", authHeader);
+
+            request.AddQueryParameter("$filter", $"tenantId eq {tenantId}");
+
+            var response = await _restClient.ExecuteAsync<ExtensionLicenseResponse>(request);
+
+            if (!response.IsSuccessful || response.Data == null)
+            {
+                throw new Exception($"Error getting ExtensionLicense with tenantId {tenantId}.");
+            }
+
+            return response.Data;
         }
     }
 }
