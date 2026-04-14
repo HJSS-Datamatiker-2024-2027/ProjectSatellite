@@ -16,28 +16,43 @@ namespace ProjectSatellite.DAL
             _redisCache = redisCache;
         }
 
-        public async Task<ExtensionLicense> GetAsync(string tenantId)
+        public async Task<ExtensionLicense> GetAsync(Guid tenantId, int extensionId)
         {
             try
             {
-                var data = await _redisCache.StringGetAsync($"license:{tenantId}");
+                var data = await _redisCache.HashGetAllAsync($"licenses:{tenantId}");
 
-                if (data.IsNullOrEmpty)
+                IEnumerable<ExtensionLicense> licenses = data.Select(extId => JsonSerializer.Deserialize<ExtensionLicense>((string)extId.Value!)).ToList();
+                if (licenses == null)
                 {
-                    throw new Exception($"License with tenantId {tenantId} was not found!"); //TODO: Cache miss er normale, så vi der burde nok ikke smides en exception her!
+                    throw new Exception("Failed to deserialize licenses");
                 }
 
-                var result = JsonSerializer.Deserialize<ExtensionLicense>((string)data!);
-                if (result == null)
-                {
-                    throw new Exception("Failed to deserialize ExtensionLicense");
-                }
-
-                return result;
+                return licenses.Where(license => license.ExtensionId == extensionId).First();
             }
             catch (Exception ex)
             {
                 throw new Exception($"Error getting license with tenantId {tenantId}. Message was {ex.Message}");
+            }
+        }
+
+        public async Task<IEnumerable<ExtensionLicense>> GetAllAsync(Guid tenantId)
+        {
+            try
+            {
+                var data = await _redisCache.HashGetAllAsync($"licenses:{tenantId}");
+
+                IEnumerable<ExtensionLicense> licenses = data.Select(extId => JsonSerializer.Deserialize<ExtensionLicense>((string)extId.Value!)).ToList();
+                if (licenses == null)
+                {
+                    throw new Exception("Failed to deserialize licenses");
+                }
+                
+                return licenses;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error getting all licenses with tenantId {tenantId}. Message was {ex.Message}");
             }
         }
 
@@ -47,10 +62,9 @@ namespace ProjectSatellite.DAL
             {
                 var json = JsonSerializer.Serialize(extensionLicense);
 
-                bool success = await _redisCache.StringSetAsync($"license:{extensionLicense.TenantId}", json, TimeSpan.FromMinutes(5));
+                bool success = await _redisCache.HashSetAsync($"licenses:{extensionLicense.TenantId}", extensionLicense.ExtensionId, json);
 
-                //TODO: slet dette:
-                //await _redisCache.SetAddAsync("licenses:all", extensionLicense.TenantId);
+                await _redisCache.KeyExpireAsync($"licenses:{extensionLicense.TenantId}", TimeSpan.FromMinutes(5));
 
                 return success;
             }
