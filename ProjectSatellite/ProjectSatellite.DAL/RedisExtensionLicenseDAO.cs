@@ -20,15 +20,15 @@ namespace ProjectSatellite.DAL
         {
             try
             {
-                var data = await _redisCache.HashGetAllAsync($"licenses:{tenantId}");
+                var data = await _redisCache.HashGetAsync($"licenses:{tenantId}", extensionId);
 
-                IEnumerable<ExtensionLicense> licenses = data.Select(extId => JsonSerializer.Deserialize<ExtensionLicense>((string)extId.Value!)).ToList();
-                if (licenses == null)
+                ExtensionLicense license = JsonSerializer.Deserialize<ExtensionLicense>((string)data!);
+                if (license == null)
                 {
-                    throw new Exception("Failed to deserialize licenses");
+                    throw new Exception("Failed to deserialize license");
                 }
 
-                return licenses.Where(license => license.ExtensionId == extensionId).First();
+                return license;
             }
             catch (Exception ex)
             {

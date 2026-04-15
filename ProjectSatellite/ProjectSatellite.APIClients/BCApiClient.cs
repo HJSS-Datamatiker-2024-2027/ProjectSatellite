@@ -20,7 +20,7 @@ namespace ProjectSatellite.APIClients
             _restClient = new RestClient(_baseUri);
         }
 
-        public async Task<ExtensionLicenseResponse> GetAsync(Guid tenantId, int extensionId)
+        public async Task<ExtensionLicense> GetAsync(Guid tenantId, int extensionId)
         {
             var request = new RestRequest();
             request.Method = Method.Get;
@@ -40,10 +40,10 @@ namespace ProjectSatellite.APIClients
                 throw new Exception($"Error getting ExtensionLicense with tenantId {tenantId} and extensionId {extensionId}.");
             }
 
-            return response.Data; //TODO: Temp løsning
+            return response.Data.Value.First();
         }
 
-        public async Task<ExtensionLicenseResponse> GetAllAsync(Guid tenantId)
+        public async Task<IEnumerable<ExtensionLicense>> GetAllAsync(Guid tenantId)
         {
             var request = new RestRequest();
             request.Method = Method.Get;
@@ -63,7 +63,7 @@ namespace ProjectSatellite.APIClients
                 throw new Exception($"Error getting ExtensionLicense with tenantId {tenantId}.");
             }
 
-            return response.Data;
+            return response.Data.Value;
         }
     }
 }
