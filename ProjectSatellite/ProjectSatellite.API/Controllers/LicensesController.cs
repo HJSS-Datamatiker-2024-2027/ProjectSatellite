@@ -11,7 +11,7 @@ namespace ProjectSatellite.API.Controllers
     public class LicensesController : ControllerBase
     {
         private readonly IApiClient _bcApiClient;
-        private readonly IExtensionLicenseDAO _extensionLicenseDAO; //TODO: temp
+        private readonly IExtensionLicenseDAO _extensionLicenseDAO;
 
         public LicensesController(IApiClient licenseApiClient, IExtensionLicenseDAO extensionLicenseDAO)
         {
@@ -24,14 +24,21 @@ namespace ProjectSatellite.API.Controllers
         {
             try
             {
-                IEnumerable<ExtensionLicense> response = await _bcApiClient.GetAllAsync(tenantId);
-                
-                foreach (var license in response)
-                {
-                    await _extensionLicenseDAO.InsertAsync(license);
-                }
+                IEnumerable<ExtensionLicense>? cacheResult = await _extensionLicenseDAO.GetAllAsync(tenantId);
 
-                return Ok(await _extensionLicenseDAO.GetAllAsync(tenantId));
+                if (cacheResult == null || !cacheResult.Any())
+                {
+                    IEnumerable<ExtensionLicense> bcResult = await _bcApiClient.GetAllAsync(tenantId);
+
+                    foreach (ExtensionLicense license in bcResult)
+                    {
+                        await _extensionLicenseDAO.InsertAsync(license);
+                    }
+                    
+                    return Ok(bcResult);
+                }
+                
+                return Ok(cacheResult);
             }
             catch (Exception ex)
             {
@@ -39,12 +46,23 @@ namespace ProjectSatellite.API.Controllers
             }
         }
 
-        [HttpGet("one")]
+        [HttpGet("{extensionId}")]
         public async Task<ActionResult> GetAsync(Guid tenantId, int extensionId)
         {
             try
             {
-                return Ok(await _extensionLicenseDAO.GetAsync(tenantId, extensionId));
+                ExtensionLicense? cacheResult = await _extensionLicenseDAO.GetAsync(tenantId, extensionId);
+
+                if (cacheResult == null)
+                {
+                    ExtensionLicense bcResult = await _bcApiClient.GetAsync(tenantId, extensionId);
+
+                    await _extensionLicenseDAO.InsertAsync(bcResult);
+
+                    return Ok(bcResult);
+                }
+
+                return Ok(cacheResult);
             }
             catch (Exception ex)
             {
