@@ -16,17 +16,17 @@ namespace ProjectSatellite.DAL
             _redisCache = redisCache;
         }
 
-        public async Task<ExtensionLicense> GetAsync(Guid tenantId, int extensionId)
+        public async Task<ExtensionLicense?> GetAsync(Guid tenantId, int extensionId)
         {
             try
             {
                 var data = await _redisCache.HashGetAsync($"licenses:{tenantId}", extensionId);
-
-                ExtensionLicense license = JsonSerializer.Deserialize<ExtensionLicense>((string)data!);
-                if (license == null)
+                if (data.IsNullOrEmpty)
                 {
-                    throw new Exception("Failed to deserialize license");
+                    return null;
                 }
+
+                ExtensionLicense? license = JsonSerializer.Deserialize<ExtensionLicense>(data.ToString());
 
                 return license;
             }
@@ -36,17 +36,17 @@ namespace ProjectSatellite.DAL
             }
         }
 
-        public async Task<IEnumerable<ExtensionLicense>> GetAllAsync(Guid tenantId)
+        public async Task<IEnumerable<ExtensionLicense>?> GetAllAsync(Guid tenantId)
         {
             try
             {
                 var data = await _redisCache.HashGetAllAsync($"licenses:{tenantId}");
-
-                IEnumerable<ExtensionLicense> licenses = data.Select(extId => JsonSerializer.Deserialize<ExtensionLicense>((string)extId.Value!)).ToList();
-                if (licenses == null)
+                if (data.Length == 0)
                 {
-                    throw new Exception("Failed to deserialize licenses");
+                    return null;
                 }
+
+                IEnumerable<ExtensionLicense> licenses = data.Select(extId => JsonSerializer.Deserialize<ExtensionLicense>(extId.Value.ToString())).Where(extLicense => extLicense != null).Select(extLicense => extLicense!).ToList();
                 
                 return licenses;
             }
