@@ -64,13 +64,27 @@ namespace ProjectSatellite.DAL
 
                 bool success = await _redisCache.HashSetAsync($"licenses:{extensionLicense.TenantId}", extensionLicense.ExtensionId, json);
 
-                await _redisCache.KeyExpireAsync($"licenses:{extensionLicense.TenantId}", TimeSpan.FromMinutes(5));
+                //await _redisCache.KeyExpireAsync($"licenses:{extensionLicense.TenantId}", TimeSpan.FromMinutes(5));
 
                 return success;
             }
             catch (Exception ex)
             {
                 throw new Exception($"Error inserting extensionLicense into the cachce. Message was {ex.Message}");
+            }
+        }
+
+        public async Task<bool> DeleteAsync(Guid tenantId, int extensionId)
+        {
+            try
+            {
+                bool success = await _redisCache.HashDeleteAsync(tenantId.ToString(), extensionId);
+
+                return success;
+            } 
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting extensionLicense with tenantId {tenantId} and extensionId {extensionId}. Message was {ex.Message}");
             }
         }
     }
