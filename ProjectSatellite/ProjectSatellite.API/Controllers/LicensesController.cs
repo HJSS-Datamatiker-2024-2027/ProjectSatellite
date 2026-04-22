@@ -69,5 +69,20 @@ namespace ProjectSatellite.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpDelete]
+        public async Task<ActionResult> DeleteASync(Guid tenantId, int extensionId)
+        {
+            try
+            {
+                bool success = await _extensionLicenseDAO.DeleteAsync(tenantId, extensionId);
+
+                return Ok(success);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
