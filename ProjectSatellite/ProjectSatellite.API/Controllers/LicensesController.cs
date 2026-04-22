@@ -71,7 +71,7 @@ namespace ProjectSatellite.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult> DeleteASync(Guid tenantId, int extensionId)
+        public async Task<ActionResult> DeleteAsync(Guid tenantId, int extensionId)
         {
             try
             {

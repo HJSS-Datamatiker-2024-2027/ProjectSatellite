@@ -10,5 +10,6 @@ namespace ProjectSatellite.DAL
         public Task<ExtensionLicense?> GetAsync(Guid tenantId, int extensionId);
         public Task<IEnumerable<ExtensionLicense>?> GetAllAsync(Guid tenantId);
         public Task<bool> InsertAsync(ExtensionLicense extensionLicense);
+        public Task<bool> DeleteAsync(Guid tenantId, int extensionId);
     }
 }
