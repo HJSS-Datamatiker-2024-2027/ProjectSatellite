@@ -30,7 +30,7 @@ namespace ProjectSatellite.API
             configuration["TENANT_ID"], configuration["CLIENT_ID"], configuration["CLIENT_SECRET"])); //TODO: smid i .env
 
             builder.Services.AddSingleton(ConnectionMultiplexer.Connect(
-                $"{configuration["REDIS_HOST"]}:{configuration["REDIS_PORT"]},password={configuration["REDIS_PASSWORD"]},ssl=true,abortConnect=false"
+                $"{configuration["REDIS_HOST"]}:{configuration["REDIS_PORT"]},password={configuration["REDIS_PASSWORD"]},abortConnect=false"
                 ));
 
             builder.Services.AddScoped<IDatabase>(sp =>
