@@ -102,7 +102,7 @@ namespace ProjectSatellite.APIClients
 
             request.AddHeader("Authorization", $"Bearer {accessToken}");
             request.AddQueryParameter("company", "CRONUS Danmark A/S");
-            request.AddQueryParameter("$filter", $"tenantId eq {_tenantId}", false);
+            request.AddQueryParameter("$filter", $"tenantId eq {tenantId}", false);
 
             var response = await _cloudRestClient.ExecuteAsync<ExtensionLicenseResponse>(request);
 
