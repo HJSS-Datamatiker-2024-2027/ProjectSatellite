@@ -1,0 +1,25 @@
+name: Build & Push Docker Images
+
+on:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Log in to GitHub Container Registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+    - name: Build and push ProjectSatellite image
+      run: |
+        IMAGE=ghcr.io/hjss-datamatiker-2024-2027/projectsatellite:latest
+        docker build -t $IMAGE -f ProjectSatellite/ProjectSatellite.API/Dockerfile ProjectSatellite
+        docker push $IMAGE
