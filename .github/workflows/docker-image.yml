@@ -2,7 +2,7 @@ name: Build & Push Docker Images
 
 on:
   push:
-    branches: [ "cloud-bc-test" ]
+    branches: [ "feature/cloud-bc-test" ]
 
 jobs:
   build:
