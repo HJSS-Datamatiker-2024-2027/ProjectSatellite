@@ -20,7 +20,7 @@ namespace ProjectSatellite.API.Controllers
         }
 
         [HttpGet("cloud")]
-        public async Task<ActionResult> GetAllAsync(Guid tenantId, string temp)
+        public async Task<ActionResult> CloudGetAllAsync(Guid tenantId)
         {
             try
             {
@@ -45,6 +45,12 @@ namespace ProjectSatellite.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("cloud")]
+        public async Task<ActionResult> CloudGetAsync(Guid tenantId, Guid extensionId)
+        {
+            throw new NotImplementedException();
+        }
+        
 
         [HttpGet]
         public async Task<ActionResult> GetAllAsync(Guid tenantId)
