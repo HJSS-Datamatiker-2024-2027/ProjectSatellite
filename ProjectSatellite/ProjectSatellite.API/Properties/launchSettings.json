@@ -12,11 +12,13 @@
     },
     "https": {
       "commandName": "Project",
+      "launchBrowser": true, //TODO: Skal slettes når Swagger fjernes
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7162;http://localhost:5022"
+      "applicationUrl": "https://localhost:7162;http://localhost:5022",
+      "launchUrl": "swagger" //TODO: Skal slettes når Swagger fjernes
     },
     "Container (Dockerfile)": {
       "commandName": "Docker",

@@ -16,11 +16,11 @@ namespace ProjectSatellite.DAL
             _redisCache = redisCache;
         }
 
-        public async Task<ExtensionLicense?> GetAsync(Guid tenantId, int extensionId)
+        public async Task<ExtensionLicense?> GetAsync(Guid tenantId, Guid extensionId)
         {
             try
             {
-                var data = await _redisCache.HashGetAsync($"licenses:{tenantId}", extensionId);
+                var data = await _redisCache.HashGetAsync($"licenses:{tenantId}", extensionId.ToString());
                 if (data.IsNullOrEmpty)
                 {
                     return null;
@@ -62,7 +62,7 @@ namespace ProjectSatellite.DAL
             {
                 var json = JsonSerializer.Serialize(extensionLicense);
 
-                bool success = await _redisCache.HashSetAsync($"licenses:{extensionLicense.TenantId}", extensionLicense.ExtensionId, json);
+                bool success = await _redisCache.HashSetAsync($"licenses:{extensionLicense.TenantId}", extensionLicense.ExtensionId.ToString(), json);
 
                 //await _redisCache.KeyExpireAsync($"licenses:{extensionLicense.TenantId}", TimeSpan.FromMinutes(5));
 
@@ -74,11 +74,11 @@ namespace ProjectSatellite.DAL
             }
         }
 
-        public async Task<bool> DeleteAsync(Guid tenantId, int extensionId)
+        public async Task<bool> DeleteAsync(Guid tenantId, Guid extensionId)
         {
             try
             {
-                bool success = await _redisCache.HashDeleteAsync(tenantId.ToString(), extensionId);
+                bool success = await _redisCache.HashDeleteAsync(tenantId.ToString(), extensionId.ToString());
 
                 return success;
             } 

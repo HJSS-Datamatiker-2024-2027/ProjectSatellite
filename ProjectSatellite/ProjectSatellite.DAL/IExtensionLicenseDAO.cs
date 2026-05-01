@@ -7,9 +7,9 @@ namespace ProjectSatellite.DAL
 {
     public interface IExtensionLicenseDAO
     {
-        public Task<ExtensionLicense?> GetAsync(Guid tenantId, int extensionId);
+        public Task<ExtensionLicense?> GetAsync(Guid tenantId, Guid extensionId);
         public Task<IEnumerable<ExtensionLicense>?> GetAllAsync(Guid tenantId);
         public Task<bool> InsertAsync(ExtensionLicense extensionLicense);
-        public Task<bool> DeleteAsync(Guid tenantId, int extensionId);
+        public Task<bool> DeleteAsync(Guid tenantId, Guid extensionId);
     }
 }

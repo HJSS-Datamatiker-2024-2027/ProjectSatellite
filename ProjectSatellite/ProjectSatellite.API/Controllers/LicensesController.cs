@@ -19,6 +19,33 @@ namespace ProjectSatellite.API.Controllers
             _extensionLicenseDAO = extensionLicenseDAO;
         }
 
+        [HttpGet("cloud")]
+        public async Task<ActionResult> GetAllAsync(Guid tenantId, string temp)
+        {
+            try
+            {
+                IEnumerable<ExtensionLicense>? cacheResult = await _extensionLicenseDAO.GetAllAsync(tenantId);
+
+                if (cacheResult == null || !cacheResult.Any())
+                {
+                    IEnumerable<ExtensionLicense> bcResult = await _bcApiClient.CloudGetAllAsync(tenantId);
+
+                    foreach (ExtensionLicense license in bcResult)
+                    {
+                        await _extensionLicenseDAO.InsertAsync(license);
+                    }
+
+                    return Ok(bcResult);
+                }
+
+                return Ok(cacheResult);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet]
         public async Task<ActionResult> GetAllAsync(Guid tenantId)
         {
@@ -47,7 +74,7 @@ namespace ProjectSatellite.API.Controllers
         }
 
         [HttpGet("{extensionId}")]
-        public async Task<ActionResult> GetAsync(Guid tenantId, int extensionId)
+        public async Task<ActionResult> GetAsync(Guid tenantId, Guid extensionId)
         {
             try
             {
@@ -71,7 +98,7 @@ namespace ProjectSatellite.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult> DeleteAsync(Guid tenantId, int extensionId)
+        public async Task<ActionResult> DeleteAsync(Guid tenantId, Guid extensionId)
         {
             try
             {
