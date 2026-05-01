@@ -78,9 +78,37 @@ namespace ProjectSatellite.APIClients
             return response.Data.Value;
         }
 
-        public async Task<ExtensionLicense> CloudGetAsync(Guid tenantId, Guid extenstionId)
+        public async Task<ExtensionLicense> CloudGetAsync(Guid tenantId, Guid extensionId)
         {
-            throw new NotImplementedException();
+            var app = ConfidentialClientApplicationBuilder
+                .Create(_clientId)
+                .WithClientSecret(_clientSecret)
+                .WithAuthority($"https://login.microsoftonline.com/{_tenantId}")
+                .Build();
+
+            var scopes = new[] { "https://api.businesscentral.dynamics.com/.default" };
+            var tokenResult = await app.AcquireTokenForClient(scopes).ExecuteAsync();
+            string accessToken = tokenResult.AccessToken;
+
+            var request = new RestRequest();
+            request.Method = Method.Get;
+
+            request.AddHeader("Authorization", $"Bearer {accessToken}");
+            request.AddQueryParameter("company", "CRONUS Danmark A/S");
+            request.AddQueryParameter("$filter", $"tenantId eq {tenantId} and extensionId eq {extensionId}", false);
+
+            var response = await _cloudRestClient.ExecuteAsync<ExtensionLicenseResponse>(request);
+
+            if (!response.IsSuccessful || response.Data == null)
+            {
+                throw new Exception($"Error getting ExtensionLicense with tenantId {tenantId}. " +
+                    $"Status: {response.StatusCode} " +
+                    $"Description: {response.StatusDescription} " +
+                    $"Content: {response.Content} " +
+                    $"URI: {response.ResponseUri}");
+            }
+
+            return response.Data.Value.First();
         } 
 
         public async Task<IEnumerable<ExtensionLicense>> CloudGetAllAsync(Guid tenantId)
@@ -95,8 +123,6 @@ namespace ProjectSatellite.APIClients
             var tokenResult = await app.AcquireTokenForClient(scopes).ExecuteAsync();
             string accessToken = tokenResult.AccessToken;
 
-            Console.WriteLine(accessToken);
-
             var request = new RestRequest();
             request.Method = Method.Get;
 
@@ -105,8 +131,6 @@ namespace ProjectSatellite.APIClients
             request.AddQueryParameter("$filter", $"tenantId eq {tenantId}", false);
 
             var response = await _cloudRestClient.ExecuteAsync<ExtensionLicenseResponse>(request);
-
-            Console.WriteLine(response.ResponseUri);
 
             if (!response.IsSuccessful || response.Data == null)
             {

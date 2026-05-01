@@ -48,7 +48,25 @@ namespace ProjectSatellite.API.Controllers
         [HttpGet("cloud/{extensionId}")]
         public async Task<ActionResult> CloudGetAsync(Guid tenantId, Guid extensionId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                ExtensionLicense? cacheResult = await _extensionLicenseDAO.GetAsync(tenantId, extensionId);
+
+                if (cacheResult == null)
+                {
+                    ExtensionLicense bcResult = await _bcApiClient.CloudGetAsync(tenantId, extensionId);
+
+                    await _extensionLicenseDAO.InsertAsync(bcResult);
+
+                    return Ok(bcResult);
+                }
+
+                return Ok(cacheResult);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         
 
