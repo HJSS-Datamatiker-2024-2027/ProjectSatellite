@@ -45,7 +45,7 @@ namespace ProjectSatellite.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("cloud")]
+        [HttpGet("cloud/{extensionId}")]
         public async Task<ActionResult> CloudGetAsync(Guid tenantId, Guid extensionId)
         {
             throw new NotImplementedException();

@@ -29,7 +29,9 @@ namespace ProjectSatellite.API
             "https://api.businesscentral.dynamics.com/v2.0/44833fc5-b393-4b9f-897a-1f876412ddb1/sandbox/api/gruppe6/apiGroup/v1.0/licenses", 
             configuration["TENANT_ID"], configuration["CLIENT_ID"], configuration["CLIENT_SECRET"])); //TODO: smid i .env
 
-            builder.Services.AddSingleton(ConnectionMultiplexer.Connect("localhost:6379"));
+            builder.Services.AddSingleton(ConnectionMultiplexer.Connect(
+                $"{configuration["REDIS_HOST"]}:{configuration["REDIS_PORT"]},password={configuration["REDIS_PASSWORD"]},ssl=true,abortConnect=false"
+                ));
 
             builder.Services.AddScoped<IDatabase>(sp =>
                 sp.GetRequiredService<ConnectionMultiplexer>().GetDatabase());
