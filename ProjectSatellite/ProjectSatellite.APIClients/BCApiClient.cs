@@ -143,5 +143,45 @@ namespace ProjectSatellite.APIClients
 
             return response.Data.Value;
         }
+
+        public async Task<ExtensionLicense> CloudPostAsync(Guid tenantId, Guid extensionId)
+        {
+            var app = ConfidentialClientApplicationBuilder
+                .Create(_clientId)
+                .WithClientSecret(_clientSecret)
+                .WithAuthority($"https://login.microsoftonline.com/{_tenantId}")
+                .Build();
+
+            var scopes = new[] { "https://api.businesscentral.dynamics.com/.default" };
+            var tokenResult = await app.AcquireTokenForClient(scopes).ExecuteAsync();
+            string accessToken = tokenResult.AccessToken;
+
+            var request = new RestRequest();
+            request.Method = Method.Post;
+
+            request.AddHeader("Authorization", $"Bearer {accessToken}");
+            request.AddQueryParameter("company", "CRONUS Danmark A/S");
+
+            var body = new
+            {
+                tenantId = tenantId,
+                extensionId = extensionId
+            };
+
+            request.AddJsonBody(body);
+
+            var response = await _cloudRestClient.ExecuteAsync<ExtensionLicenseResponse>(request);
+
+            if (!response.IsSuccessful || response.Data == null)
+            {
+                throw new Exception($"Error creating ExtensionLicense with tenantId {tenantId}. " +
+                    $"Status: {response.StatusCode} " +
+                    $"Description: {response.StatusDescription} " +
+                    $"Content: {response.Content} " +
+                    $"URI: {response.ResponseUri}");
+            }
+
+            return response.Data.Value.First();
+        }
     }
 }

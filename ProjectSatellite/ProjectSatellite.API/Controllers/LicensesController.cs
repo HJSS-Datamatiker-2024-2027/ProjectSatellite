@@ -51,17 +51,25 @@ namespace ProjectSatellite.API.Controllers
             try
             {
                 ExtensionLicense? cacheResult = await _extensionLicenseDAO.GetAsync(tenantId, extensionId);
-
-                if (cacheResult == null)
+                if (cacheResult != null)
                 {
-                    ExtensionLicense bcResult = await _bcApiClient.CloudGetAsync(tenantId, extensionId);
-
-                    await _extensionLicenseDAO.InsertAsync(bcResult);
-
-                    return Ok(bcResult);
+                    return Ok(cacheResult);
                 }
 
-                return Ok(cacheResult);
+                ExtensionLicense bcResult;
+
+                try
+                {
+                    bcResult = await _bcApiClient.CloudGetAsync(tenantId, extensionId);
+                }
+                catch
+                {
+                    bcResult = await _bcApiClient.CloudPostAsync(tenantId, extensionId);
+                }
+
+                await _extensionLicenseDAO.InsertAsync(bcResult);
+
+                return Ok(bcResult);
             }
             catch (Exception ex)
             {

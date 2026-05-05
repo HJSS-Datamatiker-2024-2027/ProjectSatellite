@@ -11,5 +11,6 @@ namespace ProjectSatellite.APIClients
         public Task<IEnumerable<ExtensionLicense>> GetAllAsync(Guid tenantId);
         public Task<ExtensionLicense> CloudGetAsync(Guid tenantId, Guid extensionId);
         public Task<IEnumerable<ExtensionLicense>> CloudGetAllAsync(Guid tenantId);
+        public Task<ExtensionLicense> CloudPostAsync(Guid tenantId, Guid extensionId);
     }
 }
