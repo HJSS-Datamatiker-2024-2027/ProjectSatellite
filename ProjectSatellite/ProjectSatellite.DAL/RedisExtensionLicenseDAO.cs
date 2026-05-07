@@ -78,7 +78,7 @@ namespace ProjectSatellite.DAL
         {
             try
             {
-                bool success = await _redisCache.HashDeleteAsync(tenantId.ToString(), extensionId.ToString());
+                bool success = await _redisCache.HashDeleteAsync($"licenses:{tenantId}", extensionId.ToString());
 
                 return success;
             } 
